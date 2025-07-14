@@ -1,63 +1,106 @@
 #https://neetcode.io/problems/duplicate-integer?list=blind75
-def containsDuplicate(nums):
-    """
-    Given an integer array nums, return true if any value appears 
-    more than once in the array, otherwise return false.
-    
-    Time Complexity: O(n) - we iterate through the array once
-    Space Complexity: O(n) - in worst case, we store all elements in the set
-    """
-    seen = set()
-    
-    for num in nums:
-        if num in seen:
-            return True
-        seen.add(num)
-    
-    return False
+import java.util.*;
 
-# Test cases
-def test_contains_duplicate():
-    # Test case 1: Array with duplicates
-    nums1 = [1, 2, 3, 3]
-    result1 = containsDuplicate(nums1)
-    print(f"Input: {nums1}")
-    print(f"Output: {result1}")
-    print(f"Expected: True")
-    print()
+public class ContainsDuplicate {
     
-    # Test case 2: Array without duplicates
-    nums2 = [1, 2, 3, 4]
-    result2 = containsDuplicate(nums2)
-    print(f"Input: {nums2}")
-    print(f"Output: {result2}")
-    print(f"Expected: False")
-    print()
+    // Approach 1: Using HashSet - O(n) time, O(n) space
+    // Most efficient approach for general cases
+    public boolean containsDuplicate1(int[] nums) {
+        HashSet<Integer> seen = new HashSet<>();
+        
+        for (int num : nums) {
+            if (seen.contains(num)) {
+                return true;
+            }
+            seen.add(num);
+        }
+        
+        return false;
+    }
     
-    # Additional test cases
-    # Empty array
-    nums3 = []
-    result3 = containsDuplicate(nums3)
-    print(f"Input: {nums3}")
-    print(f"Output: {result3}")
-    print(f"Expected: False")
-    print()
+    // Approach 2: Using Arrays.sort() - O(n log n) time, O(1) space
+    // Good when space is limited
+    public boolean containsDuplicate2(int[] nums) {
+        Arrays.sort(nums);
+        
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1]) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
     
-    # Single element
-    nums4 = [1]
-    result4 = containsDuplicate(nums4)
-    print(f"Input: {nums4}")
-    print(f"Output: {result4}")
-    print(f"Expected: False")
-    print()
+    // Approach 3: Brute Force - O(n²) time, O(1) space
+    // Simple but inefficient - only for educational purposes
+    public boolean containsDuplicate3(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = i + 1; j < nums.length; j++) {
+                if (nums[i] == nums[j]) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
     
-    # All same elements
-    nums5 = [1, 1, 1, 1]
-    result5 = containsDuplicate(nums5)
-    print(f"Input: {nums5}")
-    print(f"Output: {result5}")
-    print(f"Expected: True")
-
-# Run tests
-if __name__ == "__main__":
-    test_contains_duplicate()
+    // Approach 4: Using HashMap to count occurrences - O(n) time, O(n) space
+    // Useful if you need to know the count of duplicates
+    public boolean containsDuplicate4(int[] nums) {
+        HashMap<Integer, Integer> count = new HashMap<>();
+        
+        for (int num : nums) {
+            count.put(num, count.getOrDefault(num, 0) + 1);
+            if (count.get(num) > 1) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    // Test cases
+    public static void main(String[] args) {
+        ContainsDuplicate solution = new ContainsDuplicate();
+        
+        // Test case 1: Contains duplicate
+        int[] nums1 = {1, 2, 3, 1};
+        System.out.println("Test 1 - [1,2,3,1]: " + solution.containsDuplicate1(nums1)); // true
+        
+        // Test case 2: No duplicates
+        int[] nums2 = {1, 2, 3, 4};
+        System.out.println("Test 2 - [1,2,3,4]: " + solution.containsDuplicate1(nums2)); // false
+        
+        // Test case 3: All same elements
+        int[] nums3 = {1, 1, 1, 3, 3, 4, 3, 2, 4, 2};
+        System.out.println("Test 3 - [1,1,1,3,3,4,3,2,4,2]: " + solution.containsDuplicate1(nums3)); // true
+        
+        // Test case 4: Single element
+        int[] nums4 = {1};
+        System.out.println("Test 4 - [1]: " + solution.containsDuplicate1(nums4)); // false
+        
+        // Test case 5: Empty array
+        int[] nums5 = {};
+        System.out.println("Test 5 - []: " + solution.containsDuplicate1(nums5)); // false
+        
+        // Performance comparison (you can uncomment to test)
+        /*
+        int[] largeArray = new int[100000];
+        for (int i = 0; i < 100000; i++) {
+            largeArray[i] = i % 50000; // This will create duplicates
+        }
+        
+        long start = System.currentTimeMillis();
+        solution.containsDuplicate1(largeArray.clone());
+        long end = System.currentTimeMillis();
+        System.out.println("HashSet approach time: " + (end - start) + "ms");
+        
+        start = System.currentTimeMillis();
+        solution.containsDuplicate2(largeArray.clone());
+        end = System.currentTimeMillis();
+        System.out.println("Sorting approach time: " + (end - start) + "ms");
+        */
+    }
+}
