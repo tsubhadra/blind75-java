@@ -1,266 +1,259 @@
-#https://neetcode.io/problems/buy-and-sell-crypto?list=blind75
-def max_profit(prices):
-    """
-    Given an array of stock prices, return the maximum profit from buying 
-    and selling once (buy before sell).
-    
-    Time Complexity: O(n)
-    Space Complexity: O(1)
-    """
-    if len(prices) < 2:
-        return 0
-    
-    min_price = prices[0]  # Minimum price seen so far
-    max_profit = 0         # Maximum profit possible
-    
-    for i in range(1, len(prices)):
-        current_price = prices[i]
-        
-        # Calculate profit if we sell today
-        current_profit = current_price - min_price
-        
-        # Update maximum profit if current is better
-        max_profit = max(max_profit, current_profit)
-        
-        # Update minimum price if current is lower
-        min_price = min(min_price, current_price)
-    
-    return max_profit
+//https://neetcode.io/problems/buy-and-sell-crypto?list=blind75
+public class BestTimeToBuyAndSellStock {
 
+    // SOLUTION 1: Optimal One-Pass Approach (Recommended)
+    // Time: O(n), Space: O(1)
+    // Key insight: Track minimum price seen so far and maximum profit
+    public int maxProfit(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
 
-def max_profit_verbose(prices):
-    """
-    Same algorithm but with detailed step-by-step output for demonstration
-    """
-    print(f"Input prices: {prices}")
-    print("Finding maximum profit from single buy-sell transaction...\n")
-    
-    if len(prices) < 2:
-        print("Not enough prices for a transaction")
-        return 0
-    
-    min_price = prices[0]
-    max_profit = 0
-    best_buy_day = 0
-    best_sell_day = 0
-    
-    print(f"Day 0: Price = {prices[0]}, Min price = {min_price}, Max profit = {max_profit}")
-    
-    for i in range(1, len(prices)):
-        current_price = prices[i]
-        current_profit = current_price - min_price
-        
-        print(f"Day {i}: Price = {current_price}")
-        print(f"  If we sell today: profit = {current_price} - {min_price} = {current_profit}")
-        
-        if current_profit > max_profit:
-            max_profit = current_profit
-            best_sell_day = i
-            # Find the day when we bought at min_price
-            for j in range(i):
-                if prices[j] == min_price:
-                    best_buy_day = j
-                    break
-            print(f"  ✓ New max profit: {max_profit} (buy day {best_buy_day}, sell day {best_sell_day})")
-        else:
-            print(f"  Current max profit remains: {max_profit}")
-        
-        if current_price < min_price:
-            min_price = current_price
-            print(f"  ✓ New min price: {min_price}")
-        
-        print(f"  Current state: min_price = {min_price}, max_profit = {max_profit}")
-        print()
-    
-    if max_profit > 0:
-        print(f"Best strategy: Buy on day {best_buy_day} at ${prices[best_buy_day]}, sell on day {best_sell_day} at ${prices[best_sell_day]}")
-    else:
-        print("No profitable transaction possible")
-    
-    print(f"Maximum profit: {max_profit}")
-    return max_profit
+        int minPrice = prices[0];  // Minimum price seen so far
+        int maxProfit = 0;        // Maximum profit achievable
 
+        for (int i = 1; i < prices.length; i++) {
+            // If current price is lower, update minimum buy price
+            if (prices[i] < minPrice) {
+                minPrice = prices[i];
+            } else {
+                // Calculate profit if we sell at current price
+                int currentProfit = prices[i] - minPrice;
+                maxProfit = Math.max(maxProfit, currentProfit);
+            }
+        }
 
-def max_profit_brute_force(prices):
-    """
-    Brute force solution for comparison - O(n²) time
-    Check all possible buy-sell combinations
-    """
-    if len(prices) < 2:
-        return 0
-    
-    max_profit = 0
-    
-    for i in range(len(prices)):
-        for j in range(i + 1, len(prices)):
-            profit = prices[j] - prices[i]
-            max_profit = max(max_profit, profit)
-    
-    return max_profit
+        return maxProfit;
+    }
 
+    // SOLUTION 2: Alternative One-Pass with Cleaner Logic
+    // Time: O(n), Space: O(1)
+    public int maxProfitAlternative(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
 
-def max_profit_with_days(prices):
-    """
-    Returns both the maximum profit and the buy/sell days
-    """
-    if len(prices) < 2:
-        return 0, -1, -1
-    
-    min_price = prices[0]
-    max_profit = 0
-    min_day = 0
-    buy_day = 0
-    sell_day = 0
-    
-    for i in range(1, len(prices)):
-        current_price = prices[i]
-        current_profit = current_price - min_price
-        
-        if current_profit > max_profit:
-            max_profit = current_profit
-            buy_day = min_day
-            sell_day = i
-        
-        if current_price < min_price:
-            min_price = current_price
-            min_day = i
-    
-    return max_profit, buy_day, sell_day
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
 
+        for (int price : prices) {
+            minPrice = Math.min(minPrice, price);
+            maxProfit = Math.max(maxProfit, price - minPrice);
+        }
 
-def visualize_stock_chart(prices):
-    """
-    Create a simple ASCII visualization of the stock prices
-    """
-    if not prices:
-        return
-    
-    max_price = max(prices)
-    min_price = min(prices)
-    
-    if max_price == min_price:
-        print("All prices are the same")
-        return
-    
-    # Normalize prices to fit in display range
-    height = 10
-    normalized = []
-    for price in prices:
-        norm = int((price - min_price) / (max_price - min_price) * (height - 1))
-        normalized.append(norm)
-    
-    print("Stock Price Chart:")
-    print(f"Max: ${max_price}")
-    
-    # Draw chart from top to bottom
-    for level in range(height - 1, -1, -1):
-        line = f"{min_price + (max_price - min_price) * level / (height - 1):4.0f} "
-        for norm_price in normalized:
-            if norm_price >= level:
-                line += "█"
-            else:
-                line += " "
-        print(line)
-    
-    # Draw day numbers
-    day_line = "     "
-    for i in range(len(prices)):
-        day_line += str(i % 10)
-    print(day_line)
-    print(f"Min: ${min_price}")
+        return maxProfit;
+    }
 
+    // SOLUTION 3: Brute Force Approach (Not recommended)
+    // Time: O(n²), Space: O(1)
+    // Check all possible buy-sell combinations
+    public int maxProfitBruteForce(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
 
-def analyze_trading_strategy():
-    """
-    Explain the trading strategy and why it works
-    """
-    print("Trading Strategy Analysis")
-    print("=" * 40)
-    print("The algorithm follows a simple but optimal strategy:")
-    print()
-    print("1. Keep track of the lowest price seen so far")
-    print("2. For each day, calculate profit if we sell today")
-    print("3. Update maximum profit if current profit is better")
-    print("4. Update minimum price if current price is lower")
-    print()
-    print("Why this works:")
-    print("• We want to buy at the lowest price and sell at the highest price")
-    print("• Since we must buy before we sell, we track the minimum price up to each day")
-    print("• For each day, we calculate the best profit if we sell that day")
-    print("• This ensures we find the optimal buy-sell combination")
-    print()
+        int maxProfit = 0;
 
+        // Try all possible buy days
+        for (int buyDay = 0; buyDay < prices.length - 1; buyDay++) {
+            // Try all possible sell days after buy day
+            for (int sellDay = buyDay + 1; sellDay < prices.length; sellDay++) {
+                int profit = prices[sellDay] - prices[buyDay];
+                maxProfit = Math.max(maxProfit, profit);
+            }
+        }
 
-def test_solution():
-    test_cases = [
-        [10, 1, 5, 6, 7, 1],
-        [10, 8, 7, 5, 2],
-        [1, 2, 3, 4, 5],
-        [5, 4, 3, 2, 1],
-        [3, 3, 3, 3],
-        [1, 2],
-        [2, 1],
-        [7, 1, 5, 3, 6, 4],
-        [1, 4, 2],
-        [2, 4, 1]
-    ]
-    
-    print("=== Testing Best Time to Buy and Sell Stock ===\n")
-    
-    for i, prices in enumerate(test_cases, 1):
-        print(f"Test Case {i}:")
-        result = max_profit(prices)
-        brute_force_result = max_profit_brute_force(prices)
-        profit, buy_day, sell_day = max_profit_with_days(prices)
-        
-        print(f"Input: {prices}")
-        print(f"Optimized result: {result}")
-        print(f"Brute force result: {brute_force_result}")
-        print(f"Results match: {result == brute_force_result}")
-        
-        if profit > 0:
-            print(f"Best trade: Buy day {buy_day} (${prices[buy_day]}), Sell day {sell_day} (${prices[sell_day]})")
-        else:
-            print("No profitable trade possible")
-        
-        # Show detailed process for first few examples
-        if i <= 2:
-            print("\nDetailed process:")
-            max_profit_verbose(prices.copy())
-            print("\nVisualization:")
-            visualize_stock_chart(prices)
-        
-        print("-" * 60)
+        return maxProfit;
+    }
 
+    // SOLUTION 4: Dynamic Programming Approach
+    // Time: O(n), Space: O(n)
+    // Track maximum profit up to each day
+    public int maxProfitDP(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
 
-def performance_comparison():
-    """
-    Compare optimized vs brute force performance
-    """
-    import time
-    
-    # Generate test data
-    test_prices = list(range(100, 0, -1)) + list(range(1, 101))  # 200 elements
-    
-    # Optimized solution
-    start = time.time()
-    for _ in range(10000):
-        max_profit(test_prices)
-    optimized_time = time.time() - start
-    
-    # Brute force solution
-    start = time.time()
-    for _ in range(100):
-        max_profit_brute_force(test_prices)
-    brute_force_time = (time.time() - start) * 100  # Scale to match iterations
-    
-    print(f"Optimized O(n): {optimized_time:.4f} seconds")
-    print(f"Brute force O(n²): {brute_force_time:.4f} seconds")
-    print(f"Optimized is {brute_force_time/optimized_time:.2f}x faster")
+        int n = prices.length;
+        int[] minPriceUpTo = new int[n];  // Minimum price from day 0 to day i
+        int[] maxProfitUpTo = new int[n]; // Maximum profit from day 0 to day i
 
+        minPriceUpTo[0] = prices[0];
+        maxProfitUpTo[0] = 0;
 
-if __name__ == "__main__":
-    analyze_trading_strategy()
-    test_solution()
-    print("\n=== Performance Comparison ===")
-    performance_comparison()
+        for (int i = 1; i < n; i++) {
+            minPriceUpTo[i] = Math.min(minPriceUpTo[i - 1], prices[i]);
+            maxProfitUpTo[i] = Math.max(maxProfitUpTo[i - 1],
+                    prices[i] - minPriceUpTo[i]);
+        }
+
+        return maxProfitUpTo[n - 1];
+    }
+
+    // SOLUTION 5: Kadane's Algorithm Variation
+    // Time: O(n), Space: O(1)
+    // Think of it as maximum subarray problem with price differences
+    public int maxProfitKadane(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
+
+        int maxProfit = 0;
+        int maxEndingHere = 0;
+
+        for (int i = 1; i < prices.length; i++) {
+            // Daily price change
+            int dailyChange = prices[i] - prices[i - 1];
+
+            // Either start new transaction or continue existing one
+            maxEndingHere = Math.max(dailyChange, maxEndingHere + dailyChange);
+
+            // Update global maximum
+            maxProfit = Math.max(maxProfit, maxEndingHere);
+        }
+
+        return maxProfit;
+    }
+
+    // SOLUTION 6: Two-Pointer Approach
+    // Time: O(n), Space: O(1)
+    // Use two pointers to track buy and sell positions
+    public int maxProfitTwoPointer(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
+
+        int buyPointer = 0;    // Points to best buy day so far
+        int maxProfit = 0;
+
+        for (int sellPointer = 1; sellPointer < prices.length; sellPointer++) {
+            // If current price is lower than buy price, update buy pointer
+            if (prices[sellPointer] < prices[buyPointer]) {
+                buyPointer = sellPointer;
+            } else {
+                // Calculate profit and update maximum
+                int currentProfit = prices[sellPointer] - prices[buyPointer];
+                maxProfit = Math.max(maxProfit, currentProfit);
+            }
+        }
+
+        return maxProfit;
+    }
+
+    // SOLUTION 7: Detailed Step-by-Step Approach (Educational)
+    // Time: O(n), Space: O(1)
+    // Shows the thinking process clearly
+    public int maxProfitDetailed(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
+
+        int minPrice = prices[0];
+        int maxProfit = 0;
+        int bestBuyDay = 0;
+        int bestSellDay = 0;
+
+        System.out.println("Day-by-day analysis:");
+        System.out.printf("Day 0: Price = %d, Min price = %d, Max profit = %d%n",
+                prices[0], minPrice, maxProfit);
+
+        for (int i = 1; i < prices.length; i++) {
+            if (prices[i] < minPrice) {
+                minPrice = prices[i];
+                bestBuyDay = i;
+                System.out.printf("Day %d: Price = %d, New min price found! Min = %d%n",
+                        i, prices[i], minPrice);
+            } else {
+                int currentProfit = prices[i] - minPrice;
+                if (currentProfit > maxProfit) {
+                    maxProfit = currentProfit;
+                    bestSellDay = i;
+                    System.out.printf("Day %d: Price = %d, New max profit! Profit = %d (buy day %d, sell day %d)%n",
+                            i, prices[i], maxProfit, bestBuyDay, bestSellDay);
+                } else {
+                    System.out.printf("Day %d: Price = %d, Profit would be %d (not better than %d)%n",
+                            i, prices[i], currentProfit, maxProfit);
+                }
+            }
+        }
+
+        if (maxProfit > 0) {
+            System.out.printf("Best strategy: Buy on day %d at price %d, sell on day %d at price %d%n",
+                    bestBuyDay, prices[bestBuyDay], bestSellDay, prices[bestSellDay]);
+        } else {
+            System.out.println("Best strategy: Don't trade (no profitable opportunity)");
+        }
+
+        return maxProfit;
+    }
+
+    // Test method to verify solutions
+    public static void main(String[] args) {
+        BestTimeToBuyAndSellStock solution = new BestTimeToBuyAndSellStock();
+
+        // Test case 1
+        int[] prices1 = {10, 1, 5, 6, 7, 1};
+        System.out.println("Input: [10,1,5,6,7,1]");
+        System.out.println("Output: " + solution.maxProfit(prices1));
+        System.out.println("Expected: 6 (buy at 1, sell at 7)");
+
+        System.out.println("\nDetailed analysis:");
+        solution.maxProfitDetailed(prices1);
+
+        // Test case 2
+        int[] prices2 = {10, 8, 7, 5, 2};
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Input: [10,8,7,5,2]");
+        System.out.println("Output: " + solution.maxProfit(prices2));
+        System.out.println("Expected: 0 (prices only decrease)");
+
+        System.out.println("\nDetailed analysis:");
+        solution.maxProfitDetailed(prices2);
+
+        // Test case 3: Edge cases
+        int[] prices3 = {1};
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Input: [1]");
+        System.out.println("Output: " + solution.maxProfit(prices3));
+        System.out.println("Expected: 0 (only one day)");
+
+        int[] prices4 = {1, 2};
+        System.out.println("\nInput: [1,2]");
+        System.out.println("Output: " + solution.maxProfit(prices4));
+        System.out.println("Expected: 1 (buy at 1, sell at 2)");
+
+        int[] prices5 = {2, 1};
+        System.out.println("\nInput: [2,1]");
+        System.out.println("Output: " + solution.maxProfit(prices5));
+        System.out.println("Expected: 0 (price decreases)");
+
+        // Test case 4: Complex scenario
+        int[] prices6 = {7, 1, 5, 3, 6, 4};
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Input: [7,1,5,3,6,4]");
+        System.out.println("Output: " + solution.maxProfit(prices6));
+        System.out.println("Expected: 5 (buy at 1, sell at 6)");
+
+        // Performance comparison
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("Algorithm Comparison:");
+
+        int[] largePrices = new int[10000];
+        for (int i = 0; i < 10000; i++) {
+            largePrices[i] = (int) (Math.random() * 100);
+        }
+
+        long startTime = System.nanoTime();
+        int result1 = solution.maxProfit(largePrices);
+        long endTime = System.nanoTime();
+        System.out.println("Optimal O(n): " + (endTime - startTime) / 1000000.0 + " ms, Result: " + result1);
+
+        startTime = System.nanoTime();
+        int result2 = solution.maxProfitKadane(largePrices);
+        endTime = System.nanoTime();
+        System.out.println("Kadane's variation: " + (endTime - startTime) / 1000000.0 + " ms, Result: " + result2);
+
+        // Note: Brute force would be too slow for 10000 elements
+        System.out.println("Brute force O(n²): Too slow for 10000 elements (would take ~50M operations)");
+    }
+}

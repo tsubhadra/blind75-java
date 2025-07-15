@@ -1,4 +1,4 @@
-#https://neetcode.io/problems/level-order-traversal-of-binary-tree?list=blind75
+//https://neetcode.io/problems/level-order-traversal-of-binary-tree?list=blind75
 import java.util.*;
 
 // Definition for a binary tree node
@@ -15,47 +15,9 @@ class TreeNode {
     }
 }
 
-public class Solution {
+public class a30_TR_level_order_traversal_of_binary_tree {
     
-    /**
-     * Level Order Traversal using BFS with Queue
-     * Time Complexity: O(n) where n is the number of nodes
-     * Space Complexity: O(w) where w is the maximum width of the tree
-     */
-    public List<List<Integer>> levelOrder(TreeNode root) {
-        List<List<Integer>> result = new ArrayList<>();
-        
-        if (root == null) {
-            return result;
-        }
-        
-        Queue<TreeNode> queue = new LinkedList<>();
-        queue.offer(root);
-        
-        while (!queue.isEmpty()) {
-            int levelSize = queue.size();
-            List<Integer> currentLevel = new ArrayList<>();
-            
-            // Process all nodes at current level
-            for (int i = 0; i < levelSize; i++) {
-                TreeNode node = queue.poll();
-                currentLevel.add(node.val);
-                
-                // Add children to queue for next level
-                if (node.left != null) {
-                    queue.offer(node.left);
-                }
-                if (node.right != null) {
-                    queue.offer(node.right);
-                }
-            }
-            
-            result.add(currentLevel);
-        }
-        
-        return result;
-    }
-    
+
     /**
      * Alternative DFS approach using recursion
      * Time Complexity: O(n)
@@ -91,7 +53,7 @@ public class Solution {
     
     // Test method
     public static void main(String[] args) {
-        Solution solution = new Solution();
+        a30_TR_level_order_traversal_of_binary_tree a30_TR_level_order_traversal_of_binary_tree = new a30_TR_level_order_traversal_of_binary_tree();
         
         // Test case 1: [3,9,20,null,null,15,7]
         TreeNode root1 = new TreeNode(3);
@@ -100,16 +62,16 @@ public class Solution {
         root1.right.left = new TreeNode(15);
         root1.right.right = new TreeNode(7);
         
-        System.out.println("Test 1 - BFS: " + solution.levelOrder(root1));
+        System.out.println("Test 1 - DFS: " + a30_TR_level_order_traversal_of_binary_tree.levelOrderDFS(root1));
         // Expected: [[3], [9, 20], [15, 7]]
         
         // Test case 2: [1]
         TreeNode root2 = new TreeNode(1);
-        System.out.println("Test 2 - BFS: " + solution.levelOrder(root2));
+        System.out.println("Test 2 - DFS: " + a30_TR_level_order_traversal_of_binary_tree.levelOrderDFS(root2));
         // Expected: [[1]]
         
         // Test case 3: []
-        System.out.println("Test 3 - BFS: " + solution.levelOrder(null));
+        System.out.println("Test 3 - DFS: " + a30_TR_level_order_traversal_of_binary_tree.levelOrderDFS(null));
         // Expected: []
         
         // Test DFS approach
@@ -119,7 +81,7 @@ public class Solution {
         root4.right.left = new TreeNode(15);
         root4.right.right = new TreeNode(7);
         
-        System.out.println("Test 1 - DFS: " + solution.levelOrderDFS(root4));
+        System.out.println("Test 1 - DFS: " + a30_TR_level_order_traversal_of_binary_tree.levelOrderDFS(root4));
         // Expected: [[3], [9, 20], [15, 7]]
     }
 }

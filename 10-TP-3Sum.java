@@ -1,231 +1,273 @@
-#https://neetcode.io/problems/three-integer-sum?list=blind75
-def three_sum(nums):
-    """
-    Given an integer array nums, return all triplets [nums[i], nums[j], nums[k]] 
-    where nums[i] + nums[j] + nums[k] == 0, and the indices i, j, k are all distinct.
-    The output should not contain any duplicate triplets.
-    
-    Time Complexity: O(n²)
-    Space Complexity: O(1) - not counting the output array
-    """
-    if len(nums) < 3:
-        return []
-    
-    nums.sort()  # Sort to enable two-pointer technique and handle duplicates
-    result = []
-    
-    for i in range(len(nums) - 2):
-        # Skip duplicate values for the first element
-        if i > 0 and nums[i] == nums[i - 1]:
-            continue
-        
-        # Two-pointer approach for the remaining two elements
-        left = i + 1
-        right = len(nums) - 1
-        target = -nums[i]  # We want nums[left] + nums[right] = -nums[i]
-        
-        while left < right:
-            current_sum = nums[left] + nums[right]
-            
-            if current_sum == target:
-                # Found a valid triplet
-                result.append([nums[i], nums[left], nums[right]])
-                
-                # Skip duplicates for the second element
-                while left < right and nums[left] == nums[left + 1]:
-                    left += 1
-                
-                # Skip duplicates for the third element
-                while left < right and nums[right] == nums[right - 1]:
-                    right -= 1
-                
-                left += 1
-                right -= 1
-                
-            elif current_sum < target:
-                left += 1  # Need a larger sum
-            else:
-                right -= 1  # Need a smaller sum
-    
-    return result
+//https://neetcode.io/problems/three-integer-sum?list=blind75
+import java.util.*;
 
+public class ThreeSum {
 
-def three_sum_verbose(nums):
-    """
-    Same algorithm but with detailed step-by-step output for demonstration
-    """
-    print(f"Input: {nums}")
-    
-    if len(nums) < 3:
-        print("Array too short for triplets")
-        return []
-    
-    nums.sort()
-    print(f"Sorted: {nums}")
-    result = []
-    
-    for i in range(len(nums) - 2):
-        if i > 0 and nums[i] == nums[i - 1]:
-            print(f"Skipping duplicate at index {i}: {nums[i]}")
-            continue
-        
-        print(f"\nFixing first element: nums[{i}] = {nums[i]}")
-        print(f"Looking for pairs that sum to {-nums[i]}")
-        
-        left = i + 1
-        right = len(nums) - 1
-        target = -nums[i]
-        
-        while left < right:
-            current_sum = nums[left] + nums[right]
-            print(f"  Checking: {nums[left]} + {nums[right]} = {current_sum}, target = {target}")
-            
-            if current_sum == target:
-                triplet = [nums[i], nums[left], nums[right]]
-                result.append(triplet)
-                print(f"  ✓ Found triplet: {triplet}")
-                
-                # Skip duplicates
-                while left < right and nums[left] == nums[left + 1]:
-                    left += 1
-                    print(f"    Skipping duplicate left: {nums[left]}")
-                
-                while left < right and nums[right] == nums[right - 1]:
-                    right -= 1
-                    print(f"    Skipping duplicate right: {nums[right]}")
-                
-                left += 1
-                right -= 1
-                
-            elif current_sum < target:
-                left += 1
-                print(f"    Sum too small, moving left pointer")
-            else:
-                right -= 1
-                print(f"    Sum too large, moving right pointer")
-    
-    print(f"\nFinal result: {result}")
-    return result
+    // SOLUTION 1: Optimal Two-Pointer Approach (Recommended)
+    // Time: O(n²), Space: O(1) excluding output
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
 
+        if (nums == null || nums.length < 3) {
+            return result;
+        }
 
-def three_sum_brute_force(nums):
-    """
-    Brute force solution for comparison - O(n³) time
-    NOT recommended for large inputs, but useful for understanding
-    """
-    if len(nums) < 3:
-        return []
-    
-    result = []
-    n = len(nums)
-    
-    for i in range(n - 2):
-        for j in range(i + 1, n - 1):
-            for k in range(j + 1, n):
-                if nums[i] + nums[j] + nums[k] == 0:
-                    triplet = sorted([nums[i], nums[j], nums[k]])
-                    if triplet not in result:
-                        result.append(triplet)
-    
-    return result
+        // Sort the array to enable two-pointer technique and handle duplicates
+        Arrays.sort(nums);
 
+        for (int i = 0; i < nums.length - 2; i++) {
+            // Skip duplicates for the first element
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
 
-def three_sum_with_target(nums, target):
-    """
-    Generalized version that finds triplets summing to any target
-    """
-    if len(nums) < 3:
-        return []
-    
-    nums.sort()
-    result = []
-    
-    for i in range(len(nums) - 2):
-        if i > 0 and nums[i] == nums[i - 1]:
-            continue
-        
-        left = i + 1
-        right = len(nums) - 1
-        remaining_target = target - nums[i]
-        
-        while left < right:
-            current_sum = nums[left] + nums[right]
-            
-            if current_sum == remaining_target:
-                result.append([nums[i], nums[left], nums[right]])
-                
-                while left < right and nums[left] == nums[left + 1]:
-                    left += 1
-                while left < right and nums[right] == nums[right - 1]:
-                    right -= 1
-                
-                left += 1
-                right -= 1
-                
-            elif current_sum < remaining_target:
-                left += 1
-            else:
-                right -= 1
-    
-    return result
+            // Two-pointer approach for the remaining two elements
+            int left = i + 1;
+            int right = nums.length - 1;
+            int target = -nums[i];
 
+            while (left < right) {
+                int sum = nums[left] + nums[right];
 
-def test_solution():
-    test_cases = [
-        [-1, 0, 1, 2, -1, -4],
-        [0, 1, 1],
-        [0, 0, 0],
-        [-2, 0, 1, 1, 2],
-        [-1, 0, 1],
-        [1, 2, -2, -1],
-        [],
-        [0, 0],
-        [1, 1, 1],
-        [-4, -2, -2, -2, 0, 1, 2, 2, 2, 3, 3, 4, 4, 6, 6]
-    ]
-    
-    print("=== Testing 3Sum Solution ===\n")
-    
-    for i, nums in enumerate(test_cases, 1):
-        print(f"Test Case {i}:")
-        result = three_sum(nums)
-        print(f"Input: {nums}")
-        print(f"Output: {result}")
-        
-        # Show detailed process for first few examples
-        if i <= 2:
-            print("Detailed process:")
-            three_sum_verbose(nums.copy())
-        
-        print("-" * 60)
+                if (sum == target) {
+                    // Found a triplet
+                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
 
+                    // Skip duplicates for left pointer
+                    while (left < right && nums[left] == nums[left + 1]) {
+                        left++;
+                    }
 
-def performance_comparison():
-    """
-    Compare optimized vs brute force (for small inputs only)
-    """
-    import time
-    
-    test_array = [-1, 0, 1, 2, -1, -4, -2, -3, 3, 0, 4]
-    
-    # Optimized solution
-    start = time.time()
-    for _ in range(1000):
-        three_sum(test_array.copy())
-    optimized_time = time.time() - start
-    
-    # Brute force solution
-    start = time.time()
-    for _ in range(1000):
-        three_sum_brute_force(test_array.copy())
-    brute_force_time = time.time() - start
-    
-    print(f"Optimized O(n²): {optimized_time:.4f} seconds")
-    print(f"Brute force O(n³): {brute_force_time:.4f} seconds")
-    print(f"Optimized is {brute_force_time/optimized_time:.2f}x faster")
+                    // Skip duplicates for right pointer
+                    while (left < right && nums[right] == nums[right - 1]) {
+                        right--;
+                    }
 
+                    left++;
+                    right--;
+                } else if (sum < target) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
 
-if __name__ == "__main__":
-    test_solution()
-    print("\n=== Performance Comparison ===")
-    performance_comparison()
+        return result;
+    }
+
+    // SOLUTION 2: HashSet Approach for Duplicate Handling
+    // Time: O(n²), Space: O(n)
+    public List<List<Integer>> threeSumHashSet(int[] nums) {
+        Set<List<Integer>> resultSet = new HashSet<>();
+
+        if (nums == null || nums.length < 3) {
+            return new ArrayList<>(resultSet);
+        }
+
+        Arrays.sort(nums);
+
+        for (int i = 0; i < nums.length - 2; i++) {
+            int left = i + 1;
+            int right = nums.length - 1;
+
+            while (left < right) {
+                int sum = nums[i] + nums[left] + nums[right];
+
+                if (sum == 0) {
+                    resultSet.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                    left++;
+                    right--;
+                } else if (sum < 0) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
+
+        return new ArrayList<>(resultSet);
+    }
+
+    // SOLUTION 3: HashMap Approach (Two Sum variation)
+    // Time: O(n²), Space: O(n)
+    public List<List<Integer>> threeSumHashMap(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+
+        if (nums == null || nums.length < 3) {
+            return result;
+        }
+
+        Arrays.sort(nums);
+
+        for (int i = 0; i < nums.length - 2; i++) {
+            // Skip duplicates for the first element
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            // Use HashMap to find two sum
+            Map<Integer, Integer> map = new HashMap<>();
+            int target = -nums[i];
+
+            for (int j = i + 1; j < nums.length; j++) {
+                int complement = target - nums[j];
+
+                if (map.containsKey(complement)) {
+                    result.add(Arrays.asList(nums[i], complement, nums[j]));
+
+                    // Skip duplicates for nums[j]
+                    while (j + 1 < nums.length && nums[j] == nums[j + 1]) {
+                        j++;
+                    }
+                }
+
+                map.put(nums[j], j);
+            }
+        }
+
+        return result;
+    }
+
+    // SOLUTION 4: Brute Force with Set for Duplicates (Not recommended)
+    // Time: O(n³), Space: O(n)
+    public List<List<Integer>> threeSumBruteForce(int[] nums) {
+        Set<List<Integer>> resultSet = new HashSet<>();
+
+        if (nums == null || nums.length < 3) {
+            return new ArrayList<>(resultSet);
+        }
+
+        Arrays.sort(nums);
+
+        for (int i = 0; i < nums.length - 2; i++) {
+            for (int j = i + 1; j < nums.length - 1; j++) {
+                for (int k = j + 1; k < nums.length; k++) {
+                    if (nums[i] + nums[j] + nums[k] == 0) {
+                        resultSet.add(Arrays.asList(nums[i], nums[j], nums[k]));
+                    }
+                }
+            }
+        }
+
+        return new ArrayList<>(resultSet);
+    }
+
+    // SOLUTION 5: Optimized with Early Termination
+    // Time: O(n²), Space: O(1) excluding output
+    public List<List<Integer>> threeSumOptimized(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+
+        if (nums == null || nums.length < 3) {
+            return result;
+        }
+
+        Arrays.sort(nums);
+
+        for (int i = 0; i < nums.length - 2; i++) {
+            // Early termination: if current number is positive and it's the smallest,
+            // no way to get sum = 0
+            if (nums[i] > 0) {
+                break;
+            }
+
+            // Skip duplicates for the first element
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            int left = i + 1;
+            int right = nums.length - 1;
+            int target = -nums[i];
+
+            while (left < right) {
+                int sum = nums[left] + nums[right];
+
+                if (sum == target) {
+                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+
+                    // Skip duplicates
+                    while (left < right && nums[left] == nums[left + 1]) {
+                        left++;
+                    }
+                    while (left < right && nums[right] == nums[right - 1]) {
+                        right--;
+                    }
+
+                    left++;
+                    right--;
+                } else if (sum < target) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    // Helper method to print results nicely
+    private void printResult(List<List<Integer>> result) {
+        System.out.print("[");
+        for (int i = 0; i < result.size(); i++) {
+            System.out.print(result.get(i));
+            if (i < result.size() - 1) {
+                System.out.print(",");
+            }
+        }
+        System.out.println("]");
+    }
+
+    // Test method to verify solutions
+    public static void main(String[] args) {
+        ThreeSum solution = new ThreeSum();
+
+        // Test case 1
+        int[] nums1 = {-1, 0, 1, 2, -1, -4};
+        System.out.println("Input: [-1,0,1,2,-1,-4]");
+        System.out.print("Output: ");
+        List<List<Integer>> result1 = solution.threeSum(nums1);
+        solution.printResult(result1);
+        System.out.println("Expected: [[-1,-1,2],[-1,0,1]]");
+
+        // Test case 2
+        int[] nums2 = {0, 1, 1};
+        System.out.println("\nInput: [0,1,1]");
+        System.out.print("Output: ");
+        List<List<Integer>> result2 = solution.threeSum(nums2);
+        solution.printResult(result2);
+        System.out.println("Expected: []");
+
+        // Test case 3
+        int[] nums3 = {0, 0, 0};
+        System.out.println("\nInput: [0,0,0]");
+        System.out.print("Output: ");
+        List<List<Integer>> result3 = solution.threeSum(nums3);
+        solution.printResult(result3);
+        System.out.println("Expected: [[0,0,0]]");
+
+        // Test case 4: Edge case with duplicates
+        int[] nums4 = {-1, 0, 1, 2, -1, -4, -2, -3, 3, 0, 4};
+        System.out.println("\nInput: [-1,0,1,2,-1,-4,-2,-3,3,0,4]");
+        System.out.print("Output: ");
+        List<List<Integer>> result4 = solution.threeSum(nums4);
+        solution.printResult(result4);
+
+        // Test case 5: All same elements
+        int[] nums5 = {1, 1, 1};
+        System.out.println("\nInput: [1,1,1]");
+        System.out.print("Output: ");
+        List<List<Integer>> result5 = solution.threeSum(nums5);
+        solution.printResult(result5);
+        System.out.println("Expected: []");
+
+        // Test case 6: Two elements only
+        int[] nums6 = {1, 2};
+        System.out.println("\nInput: [1,2]");
+        System.out.print("Output: ");
+        List<List<Integer>> result6 = solution.threeSum(nums6);
+        solution.printResult(result6);
+        System.out.println("Expected: []");
+    }
+}

@@ -1,219 +1,74 @@
-#https://neetcode.io/problems/reorder-linked-list?list=blind75
-# Definition for singly-linked list.
-class ListNode(object):
-    def __init__(self, val=0, next=None):
-        self.val = val
-        self.next = next
+https://neetcode.io/problems/reorder-linked-list?list=blind75
+import java.util.*;
 
-class Solution(object):
-    def reorderList(self, head):
-        """
-        Optimal solution: Find middle, reverse second half, merge
-        Time: O(n), Space: O(1)
-        :type head: ListNode
-        :rtype: None Do not return anything, modify head in-place instead.
-        """
-        if not head or not head.next:
-            return
-        
-        # Step 1: Find the middle of the linked list
-        slow = fast = head
-        while fast.next and fast.next.next:
-            slow = slow.next
-            fast = fast.next.next
-        
-        # Step 2: Split the list into two halves
-        second_half = slow.next
-        slow.next = None  # Cut the connection
-        
-        # Step 3: Reverse the second half
-        second_half = self.reverseList(second_half)
-        
-        # Step 4: Merge the two halves alternately
-        first_half = head
-        while second_half:
-            # Store next nodes
-            temp1 = first_half.next
-            temp2 = second_half.next
-            
-            # Connect current nodes
-            first_half.next = second_half
-            second_half.next = temp1
-            
-            # Move to next pair
-            first_half = temp1
-            second_half = temp2
-    
-    def reverseList(self, head):
-        """Helper function to reverse a linked list"""
-        prev = None
-        current = head
-        
-        while current:
-            next_temp = current.next
-            current.next = prev
-            prev = current
-            current = next_temp
-        
-        return prev
-    
-    def reorderListWithArray(self, head):
-        """
-        Alternative solution using array (easier to understand)
-        Time: O(n), Space: O(n)
-        :type head: ListNode
-        :rtype: None
-        """
-        if not head or not head.next:
-            return
-        
-        # Step 1: Store all nodes in an array
-        nodes = []
-        current = head
-        while current:
-            nodes.append(current)
-            current = current.next
-        
-        # Step 2: Reorder using two pointers
-        left, right = 0, len(nodes) - 1
-        
-        while left < right:
-            # Connect left node to right node
-            nodes[left].next = nodes[right]
-            left += 1
-            
-            if left == right:
-                break
-            
-            # Connect right node to next left node
-            nodes[right].next = nodes[left]
-            right -= 1
-        
-        # Terminate the list
-        nodes[left].next = None
-    
-    def reorderListRecursive(self, head):
-        """
-        Recursive solution (more complex but educational)
-        Time: O(n), Space: O(n) due to recursion stack
-        :type head: ListNode
-        :rtype: None
-        """
-        if not head or not head.next:
-            return
-        
-        def getLength(node):
-            length = 0
-            while node:
-                length += 1
-                node = node.next
-            return length
-        
-        def reorderRecursive(node, length):
-            if length == 1:
-                return node.next
-            if length == 2:
-                return node.next.next
-            
-            # Get the tail of the reordered sublist
-            tail = reorderRecursive(node.next, length - 2)
-            
-            # Current tail of the sublist
-            current_tail = tail.next
-            
-            # Insert current_tail after current node
-            tail.next = current_tail.next
-            current_tail.next = node.next
-            node.next = current_tail
-            
-            return tail
-        
-        length = getLength(head)
-        reorderRecursive(head, length)
+// Definition for singly-linked list
+class ListNode {
+    int val;
+    ListNode next;
 
-# Helper functions for testing
-def create_linked_list(arr):
-    if not arr:
-        return None
-    
-    head = ListNode(arr[0])
-    current = head
-    for val in arr[1:]:
-        current.next = ListNode(val)
-        current = current.next
-    return head
+    ListNode() {}
 
-def linked_list_to_array(head):
-    result = []
-    current = head
-    while current:
-        result.append(current.val)
-        current = current.next
-    return result
+    ListNode(int val) {
+        this.val = val;
+    }
 
-def print_transformation(original, reordered):
-    print(f"Original:  {original}")
-    print(f"Reordered: {reordered}")
+    ListNode(int val, ListNode next) {
+        this.val = val;
+        this.next = next;
+    }
+}
 
-# Test the solutions
-if __name__ == "__main__":
-    solution = Solution()
-    
-    # Test case 1: [1,2,3,4] -> [1,4,2,3]
-    print("Test Case 1: Even length")
-    head1 = create_linked_list([1, 2, 3, 4])
-    original1 = linked_list_to_array(head1)
-    solution.reorderList(head1)
-    reordered1 = linked_list_to_array(head1)
-    print_transformation(original1, reordered1)
-    print()
-    
-    # Test case 2: [1,2,3,4,5] -> [1,5,2,4,3]
-    print("Test Case 2: Odd length")
-    head2 = create_linked_list([1, 2, 3, 4, 5])
-    original2 = linked_list_to_array(head2)
-    solution.reorderList(head2)
-    reordered2 = linked_list_to_array(head2)
-    print_transformation(original2, reordered2)
-    print()
-    
-    # Test case 3: [1,2] -> [1,2]
-    print("Test Case 3: Two nodes")
-    head3 = create_linked_list([1, 2])
-    original3 = linked_list_to_array(head3)
-    solution.reorderList(head3)
-    reordered3 = linked_list_to_array(head3)
-    print_transformation(original3, reordered3)
-    print()
-    
-    # Test case 4: [1] -> [1]
-    print("Test Case 4: Single node")
-    head4 = create_linked_list([1])
-    original4 = linked_list_to_array(head4)
-    solution.reorderList(head4)
-    reordered4 = linked_list_to_array(head4)
-    print_transformation(original4, reordered4)
-    print()
-    
-    # Test case 5: Using array approach
-    print("Test Case 5: Array approach [1,2,3,4,5,6]")
-    head5 = create_linked_list([1, 2, 3, 4, 5, 6])
-    original5 = linked_list_to_array(head5)
-    solution.reorderListWithArray(head5)
-    reordered5 = linked_list_to_array(head5)
-    print_transformation(original5, reordered5)
-    print()
-    
-    # Demonstrate step-by-step process
-    print("="*50)
-    print("Step-by-step breakdown for [1,2,3,4,5,6]:")
-    print("1. Original: 1->2->3->4->5->6")
-    print("2. Find middle: split at 3, get 1->2->3 and 4->5->6")
-    print("3. Reverse second half: 1->2->3 and 6->5->4")
-    print("4. Merge alternately: 1->6->2->5->3->4")
-    print("="*50)
-    
-    print("\nAlgorithm Comparison:")
-    print("1. Optimal (Find middle + Reverse + Merge): O(n) time, O(1) space")
-    print("2. Array approach: O(n) time, O(n) space - easier to understand")
-    print("3. Recursive: O(n) time, O(n) space - complex but educational")
+public class ReorderLinkedList {
+
+    // SOLUTION 1: Optimal Three-Step Approach (Recommended)
+    // Time: O(n), Space: O(1)
+    // Step 1: Find middle, Step 2: Reverse second half, Step 3: Merge alternately
+    public void reorderList(ListNode head) {
+        if (head == null || head.next == null) {
+            return;
+        }
+
+        // Step 1: Find the middle of the linked list using slow/fast pointers
+        ListNode slow = head;
+        ListNode fast = head;
+
+        while (fast.next != null && fast.next.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        // Step 2: Reverse the second half
+        ListNode secondHalf = reverseList(slow.next);
+        slow.next = null;  // Cut the connection
+
+        // Step 3: Merge the two halves alternately
+        mergeTwoLists(head, secondHalf);
+    }
+
+    // Helper method to reverse a linked list
+    private ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode current = head;
+
+        while (current != null) {
+            ListNode nextTemp = current.next;
+            current.next = prev;
+            prev = current;
+            current = nextTemp;
+        }
+
+        return prev;
+    }
+
+    // Helper method to merge two lists alternately
+    private void mergeTwoLists(ListNode first, ListNode second) {
+        while (second != null) {
+            ListNode firstNext = first.next;
+            ListNode secondNext = second.next;
+
+            first.next = second;
+            second.next = firstNext;
+
+            first = firstNext;
+            second = secondNext;
+        }\n    }\n    \n    // SOLUTION 2: Using ArrayList (Simpler but uses extra space)\n    // Time: O(n), Space: O(n)\n    public void reorderListArrayList(ListNode head) {\n        if (head == null || head.next == null) {\n            return;\n        }\n        \n        // Step 1: Store all nodes in ArrayList\n        List<ListNode> nodes = new ArrayList<>();\n        ListNode current = head;\n        \n        while (current != null) {\n            nodes.add(current);\n            current = current.next;\n        }\n        \n        // Step 2: Reorder using two pointers\n        int left = 0;\n        int right = nodes.size() - 1;\n        \n        while (left < right) {\n            nodes.get(left).next = nodes.get(right);\n            left++;\n            \n            if (left < right) {\n                nodes.get(right).next = nodes.get(left);\n                right--;\n            }\n        }\n        \n        // Terminate the list\n        nodes.get(left).next = null;\n    }\n    \n    // SOLUTION 3: Using Stack (Alternative approach)\n    // Time: O(n), Space: O(n)\n    public void reorderListStack(ListNode head) {\n        if (head == null || head.next == null) {\n            return;\n        }\n        \n        // Step 1: Push all nodes to stack\n        Stack<ListNode> stack = new Stack<>();\n        ListNode current = head;\n        int length = 0;\n        \n        while (current != null) {\n            stack.push(current);\n            current = current.next;\n            length++;\n        }\n        \n        // Step 2: Rebuild list by alternating between start and stack\n        current = head;\n        for (int i = 0; i < length / 2; i++) {\n            ListNode fromEnd = stack.pop();\n            ListNode nextNode = current.next;\n            \n            current.next = fromEnd;\n            fromEnd.next = nextNode;\n            current = nextNode;\n        }\n        \n        // Terminate the list\n        current.next = null;\n    }\n    \n    // SOLUTION 4: Detailed Step-by-Step Approach (Educational)\n    // Time: O(n), Space: O(1)\n    public void reorderListDetailed(ListNode head) {\n        if (head == null || head.next == null) {\n            System.out.println(\"List too short to reorder\");\n            return;\n        }\n        \n        System.out.println(\"Original list:\");\n        printList(head);\n        \n        // Step 1: Find middle\n        System.out.println(\"\\nStep 1: Finding middle...\");\n        ListNode slow = head;\n        ListNode fast = head;\n        \n        while (fast.next != null && fast.next.next != null) {\n            slow = slow.next;\n            fast = fast.next.next;\n        }\n        \n        System.out.println(\"Middle found at value: \" + slow.val);\n        \n        // Step 2: Split and reverse second half\n        System.out.println(\"\\nStep 2: Splitting and reversing second half...\");\n        ListNode secondHalf = slow.next;\n        slow.next = null;\n        \n        System.out.print(\"First half: \");\n        printList(head);\n        System.out.print(\"Second half before reverse: \");\n        printList(secondHalf);\n        \n        secondHalf = reverseList(secondHalf);\n        System.out.print(\"Second half after reverse: \");\n        printList(secondHalf);\n        \n        // Step 3: Merge alternately\n        System.out.println(\"\\nStep 3: Merging alternately...\");\n        mergeTwoListsDetailed(head, secondHalf);\n        \n        System.out.print(\"Final reordered list: \");\n        printList(head);\n    }\n    \n    // Detailed merge for educational purposes\n    private void mergeTwoListsDetailed(ListNode first, ListNode second) {\n        int step = 1;\n        while (second != null) {\n            ListNode firstNext = first.next;\n            ListNode secondNext = second.next;\n            \n            System.out.printf(\"  Step %d: Connecting %d -> %d -> %s\\n\", \n                            step, first.val, second.val, \n                            firstNext != null ? String.valueOf(firstNext.val) : \"null\");\n            \n            first.next = second;\n            second.next = firstNext;\n            \n            first = firstNext;\n            second = secondNext;\n            step++;\n        }\n    }\n    \n    // SOLUTION 5: Recursive Approach (Not recommended due to stack overflow risk)\n    // Time: O(n), Space: O(n)\n    public void reorderListRecursive(ListNode head) {\n        if (head == null || head.next == null) {\n            return;\n        }\n        \n        int length = getLength(head);\n        reorderHelper(head, length);\n    }\n    \n    private ListNode reorderHelper(ListNode head, int length) {\n        if (length == 1) {\n            ListNode tail = head.next;\n            head.next = null;\n            return tail;\n        }\n        \n        if (length == 2) {\n            ListNode tail = head.next;\n            head.next.next = null;\n            return tail;\n        }\n        \n        ListNode tail = reorderHelper(head.next, length - 2);\n        ListNode nextTail = tail.next;\n        tail.next = head.next;\n        head.next = tail;\n        \n        return nextTail;\n    }\n    \n    private int getLength(ListNode head) {\n        int length = 0;\n        while (head != null) {\n            length++;\n            head = head.next;\n        }\n        return length;\n    }\n    \n    // SOLUTION 6: Using Deque (Double-ended Queue)\n    // Time: O(n), Space: O(n)\n    public void reorderListDeque(ListNode head) {\n        if (head == null || head.next == null) {\n            return;\n        }\n        \n        // Store all nodes in deque\n        Deque<ListNode> deque = new ArrayDeque<>();\n        ListNode current = head;\n        \n        while (current != null) {\n            deque.addLast(current);\n            current = current.next;\n        }\n        \n        // Rebuild by alternating between front and back\n        ListNode dummy = new ListNode(0);\n        current = dummy;\n        boolean fromFront = true;\n        \n        while (!deque.isEmpty()) {\n            if (fromFront) {\n                current.next = deque.removeFirst();\n            } else {\n                current.next = deque.removeLast();\n            }\n            current = current.next;\n            fromFront = !fromFront;\n        }\n        \n        current.next = null;\n        \n        // Copy result back to original head\n        current = dummy.next;\n        ListNode original = head;\n        while (current != null) {\n            original.val = current.val;\n            original = original.next;\n            current = current.next;\n        }\n    }\n    \n    // Helper methods for testing\n    \n    // Create linked list from array\n    public ListNode createList(int[] values) {\n        if (values.length == 0) return null;\n        \n        ListNode head = new ListNode(values[0]);\n        ListNode current = head;\n        \n        for (int i = 1; i < values.length; i++) {\n            current.next = new ListNode(values[i]);\n            current = current.next;\n        }\n        \n        return head;\n    }\n    \n    // Print linked list\n    public void printList(ListNode head) {\n        if (head == null) {\n            System.out.println(\"[]\");\n            return;\n        }\n        \n        System.out.print(\"[\");\n        while (head != null) {\n            System.out.print(head.val);\n            if (head.next != null) {\n                System.out.print(\",\");\n            }\n            head = head.next;\n        }\n        System.out.println(\"]\");\n    }\n    \n    // Convert linked list to array for comparison\n    public int[] listToArray(ListNode head) {\n        List<Integer> result = new ArrayList<>();\n        while (head != null) {\n            result.add(head.val);\n            head = head.next;\n        }\n        return result.stream().mapToIn

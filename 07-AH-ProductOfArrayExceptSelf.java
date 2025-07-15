@@ -1,102 +1,132 @@
-#https://neetcode.io/problems/products-of-array-discluding-self?list=blind75
+//https://neetcode.io/problems/products-of-array-discluding-self?list=blind75
+public class ProductOfArrayExceptSelf {
 
-def product_except_self(nums):
-    """
-    Given an integer array nums, return an array output where output[i] 
-    is the product of all the elements of nums except nums[i].
-    
-    Time Complexity: O(n)
-    Space Complexity: O(1) - not counting the output array
-    """
-    n = len(nums)
-    result = [1] * n
-    
-    # First pass: calculate left products
-    # result[i] will contain the product of all elements to the left of i
-    left_product = 1
-    for i in range(n):
-        result[i] = left_product
-        left_product *= nums[i]
-    
-    # Second pass: calculate right products and multiply with left products
-    # We traverse from right to left, maintaining running product of right elements
-    right_product = 1
-    for i in range(n - 1, -1, -1):
-        result[i] *= right_product
-        right_product *= nums[i]
-    
-    return result
+    // SOLUTION 1: Optimal O(n) time, O(1) space (excluding output array)
+    // Two-pass approach: left products, then right products
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
 
+        // First pass: calculate left products
+        result[0] = 1;
+        for (int i = 1; i < n; i++) {
+            result[i] = result[i - 1] * nums[i - 1];
+        }
 
-# Alternative solution using division (simpler but has edge cases with zeros)
-def product_except_self_division(nums):
-    """
-    Alternative approach using division - handles zero cases
-    Time Complexity: O(n)
-    Space Complexity: O(1)
-    """
-    n = len(nums)
-    result = [0] * n
-    
-    # Count zeros and calculate product of non-zero elements
-    zero_count = 0
-    total_product = 1
-    
-    for num in nums:
-        if num == 0:
-            zero_count += 1
-        else:
-            total_product *= num
-    
-    # Handle different cases based on zero count
-    for i in range(n):
-        if zero_count > 1:
-            # More than one zero means all products are 0
-            result[i] = 0
-        elif zero_count == 1:
-            # Exactly one zero
-            if nums[i] == 0:
-                result[i] = total_product
-            else:
-                result[i] = 0
-        else:
-            # No zeros
-            result[i] = total_product // nums[i]
-    
-    return result
+        // Second pass: multiply by right products
+        int rightProduct = 1;
+        for (int i = n - 1; i >= 0; i--) {
+            result[i] = result[i] * rightProduct;
+            rightProduct *= nums[i];
+        }
 
+        return result;
+    }
 
-# Test cases
-def test_solution():
-    # Test case 1
-    nums1 = [1, 2, 4, 6]
-    result1 = product_except_self(nums1)
-    print(f"Input: {nums1}")
-    print(f"Output: {result1}")
-    print(f"Expected: [48, 24, 12, 8]")
-    print()
-    
-    # Test case 2
-    nums2 = [-1, 0, 1, 2, 3]
-    result2 = product_except_self(nums2)
-    print(f"Input: {nums2}")
-    print(f"Output: {result2}")
-    print(f"Expected: [0, -6, 0, 0, 0]")
-    print()
-    
-    # Additional test cases
-    nums3 = [2, 3, 4, 5]
-    result3 = product_except_self(nums3)
-    print(f"Input: {nums3}")
-    print(f"Output: {result3}")
-    print(f"Expected: [60, 40, 30, 24]")
-    print()
-    
-    nums4 = [0, 0]
-    result4 = product_except_self(nums4)
-    print(f"Input: {nums4}")
-    print(f"Output: {result4}")
-    print(f"Expected: [0, 0]")
+    // SOLUTION 2: Alternative O(n) time, O(n) space approach
+    // Uses separate arrays for left and right products
+    public int[] productExceptSelfWithExtraSpace(int[] nums) {
+        int n = nums.length;
+        int[] leftProducts = new int[n];
+        int[] rightProducts = new int[n];
+        int[] result = new int[n];
 
-if __name__ == "__main__":
-    test_solution()
+        // Calculate left products
+        leftProducts[0] = 1;
+        for (int i = 1; i < n; i++) {
+            leftProducts[i] = leftProducts[i - 1] * nums[i - 1];
+        }
+
+        // Calculate right products
+        rightProducts[n - 1] = 1;
+        for (int i = n - 2; i >= 0; i--) {
+            rightProducts[i] = rightProducts[i + 1] * nums[i + 1];
+        }
+
+        // Multiply left and right products
+        for (int i = 0; i < n; i++) {
+            result[i] = leftProducts[i] * rightProducts[i];
+        }
+
+        return result;
+    }
+
+    // SOLUTION 3: Brute Force O(n²) approach (not recommended for large inputs)
+    public int[] productExceptSelfBruteForce(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            int product = 1;
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    product *= nums[j];
+                }
+            }
+            result[i] = product;
+        }
+
+        return result;
+    }
+
+    // SOLUTION 4: Using division (handles edge cases with zeros)
+    // Note: This approach uses division but handles zero cases properly
+    public int[] productExceptSelfWithDivision(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+
+        // Count zeros and calculate total product of non-zero elements
+        int zeroCount = 0;
+        int totalProduct = 1;
+
+        for (int num : nums) {
+            if (num == 0) {
+                zeroCount++;
+            } else {
+                totalProduct *= num;
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            if (zeroCount > 1) {
+                // More than one zero means all products are zero
+                result[i] = 0;
+            } else if (zeroCount == 1) {
+                // Exactly one zero: only that position gets the total product
+                result[i] = (nums[i] == 0) ? totalProduct : 0;
+            } else {
+                // No zeros: divide total product by current element
+                result[i] = totalProduct / nums[i];
+            }
+        }
+
+        return result;
+    }
+
+    // Test method to verify solutions
+    public static void main(String[] args) {
+        ProductOfArrayExceptSelf solution = new ProductOfArrayExceptSelf();
+
+        // Test case 1
+        int[] nums1 = {1, 2, 4, 6};
+        int[] result1 = solution.productExceptSelf(nums1);
+        System.out.println("Input: [1,2,4,6]");
+        System.out.print("Output: [");
+        for (int i = 0; i < result1.length; i++) {
+            System.out.print(result1[i]);
+            if (i < result1.length - 1) System.out.print(",");
+        }
+        System.out.println("]");
+
+        // Test case 2
+        int[] nums2 = {-1, 0, 1, 2, 3};
+        int[] result2 = solution.productExceptSelf(nums2);
+        System.out.println("\nInput: [-1,0,1,2,3]");
+        System.out.print("Output: [");
+        for (int i = 0; i < result2.length; i++) {
+            System.out.print(result2[i]);
+            if (i < result2.length - 1) System.out.print(",");
+        }
+        System.out.println("]");
+    }
+}

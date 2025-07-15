@@ -1,168 +1,227 @@
-#https://neetcode.io/problems/longest-consecutive-sequence?list=blind75
-def longest_consecutive(nums):
-    """
-    Given an array of integers nums, return the length of the longest 
-    consecutive sequence of elements that can be formed.
-    
-    Time Complexity: O(n)
-    Space Complexity: O(n)
-    """
-    if not nums:
-        return 0
-    
-    # Convert to set for O(1) lookups
-    num_set = set(nums)
-    max_length = 0
-    
-    for num in num_set:
-        # Only start counting if this is the beginning of a sequence
-        # (i.e., num-1 is not in the set)
-        if num - 1 not in num_set:
-            current_num = num
-            current_length = 1
-            
-            # Count consecutive numbers starting from this point
-            while current_num + 1 in num_set:
-                current_num += 1
-                current_length += 1
-            
-            max_length = max(max_length, current_length)
-    
-    return max_length
+//https://neetcode.io/problems/longest-consecutive-sequence?list=blind75
 
+import java.util.*;
 
-def longest_consecutive_verbose(nums):
-    """
-    Same algorithm but with more detailed tracking for demonstration
-    """
-    if not nums:
-        return 0
-    
-    num_set = set(nums)
-    max_length = 0
-    longest_sequence = []
-    
-    for num in num_set:
-        # Only start if this is the beginning of a sequence
-        if num - 1 not in num_set:
-            current_sequence = [num]
-            current_num = num
-            
-            # Build the sequence
-            while current_num + 1 in num_set:
-                current_num += 1
-                current_sequence.append(current_num)
-            
-            # Update maximum if this sequence is longer
-            if len(current_sequence) > max_length:
-                max_length = len(current_sequence)
-                longest_sequence = current_sequence[:]
-    
-    print(f"Longest consecutive sequence: {longest_sequence}")
-    return max_length
+public class LongestConsecutiveSequence {
 
+    // SOLUTION 1: Optimal O(n) time, O(n) space using HashSet
+    // Key insight: Only start counting from the beginning of a sequence
+    public int longestConsecutive(int[] nums) {
+        if (nums.length == 0) return 0;
 
-# Alternative approach using Union-Find (more complex but educational)
-def longest_consecutive_union_find(nums):
-    """
-    Alternative solution using Union-Find data structure
-    Time Complexity: O(n)
-    Space Complexity: O(n)
-    """
-    if not nums:
-        return 0
-    
-    # Union-Find with path compression and union by rank
-    parent = {}
-    rank = {}
-    size = {}
-    
-    def find(x):
-        if parent[x] != x:
-            parent[x] = find(parent[x])  # Path compression
-        return parent[x]
-    
-    def union(x, y):
-        px, py = find(x), find(y)
-        if px == py:
-            return
-        
-        # Union by rank
-        if rank[px] < rank[py]:
-            px, py = py, px
-        
-        parent[py] = px
-        size[px] += size[py]
-        
-        if rank[px] == rank[py]:
-            rank[px] += 1
-    
-    # Initialize Union-Find
-    num_set = set(nums)
-    for num in num_set:
-        parent[num] = num
-        rank[num] = 0
-        size[num] = 1
-    
-    # Union consecutive numbers
-    for num in num_set:
-        if num + 1 in num_set:
-            union(num, num + 1)
-    
-    # Find the largest component
-    return max(size[find(num)] for num in num_set)
+        // Add all numbers to HashSet for O(1) lookup
+        Set<Integer> numSet = new HashSet<>();
+        for (int num : nums) {
+            numSet.add(num);
+        }
 
+        int maxLength = 0;
 
-def test_solution():
-    # Test case 1
-    nums1 = [2, 20, 4, 10, 3, 4, 5]
-    result1 = longest_consecutive(nums1)
-    print(f"Input: {nums1}")
-    print(f"Output: {result1}")
-    print(f"Expected: 4")
-    longest_consecutive_verbose(nums1)
-    print()
-    
-    # Test case 2  
-    nums2 = [0, 3, 2, 5, 4, 6, 1, 1]
-    result2 = longest_consecutive(nums2)
-    print(f"Input: {nums2}")
-    print(f"Output: {result2}")
-    print(f"Expected: 7")
-    longest_consecutive_verbose(nums2)
-    print()
-    
-    # Additional test cases
-    nums3 = [100, 4, 200, 1, 3, 2]
-    result3 = longest_consecutive(nums3)
-    print(f"Input: {nums3}")
-    print(f"Output: {result3}")
-    print(f"Expected: 4 (sequence: [1,2,3,4])")
-    longest_consecutive_verbose(nums3)
-    print()
-    
-    # Edge cases
-    nums4 = []
-    result4 = longest_consecutive(nums4)
-    print(f"Input: {nums4}")
-    print(f"Output: {result4}")
-    print(f"Expected: 0")
-    print()
-    
-    nums5 = [1]
-    result5 = longest_consecutive(nums5)
-    print(f"Input: {nums5}")
-    print(f"Output: {result5}")
-    print(f"Expected: 1")
-    print()
-    
-    nums6 = [1, 2, 0, 1]
-    result6 = longest_consecutive(nums6)
-    print(f"Input: {nums6}")
-    print(f"Output: {result6}")
-    print(f"Expected: 3 (sequence: [0,1,2])")
-    longest_consecutive_verbose(nums6)
+        // For each number, check if it's the start of a sequence
+        for (int num : numSet) {
+            // Only process if this is the start of a sequence
+            // (i.e., num-1 is not in the set)
+            if (!numSet.contains(num - 1)) {
+                int currentNum = num;
+                int currentLength = 1;
 
+                // Count consecutive numbers
+                while (numSet.contains(currentNum + 1)) {
+                    currentNum++;
+                    currentLength++;
+                }
 
-if __name__ == "__main__":
-    test_solution()
+                maxLength = Math.max(maxLength, currentLength);
+            }
+        }
+
+        return maxLength;
+    }
+
+    // SOLUTION 2: Alternative O(n) approach using HashMap to track sequence lengths
+    public int longestConsecutiveWithMap(int[] nums) {
+        if (nums.length == 0) return 0;
+
+        Map<Integer, Integer> map = new HashMap<>();
+        int maxLength = 0;
+
+        for (int num : nums) {
+            if (!map.containsKey(num)) {
+                // Get lengths of adjacent sequences
+                int leftLength = map.getOrDefault(num - 1, 0);
+                int rightLength = map.getOrDefault(num + 1, 0);
+
+                // Current sequence length
+                int currentLength = leftLength + rightLength + 1;
+                maxLength = Math.max(maxLength, currentLength);
+
+                // Update the map
+                map.put(num, currentLength);
+
+                // Update the boundaries of the sequence
+                map.put(num - leftLength, currentLength);
+                map.put(num + rightLength, currentLength);
+            }
+        }
+
+        return maxLength;
+    }
+
+    // SOLUTION 3: Sorting approach O(n log n) time, O(1) space
+    // Not optimal but easier to understand
+    public int longestConsecutiveSorting(int[] nums) {
+        if (nums.length == 0) return 0;
+
+        Arrays.sort(nums);
+
+        int maxLength = 1;
+        int currentLength = 1;
+
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1]) {
+                // Skip duplicates
+                continue;
+            } else if (nums[i] == nums[i - 1] + 1) {
+                // Consecutive number found
+                currentLength++;
+            } else {
+                // Sequence broken, reset
+                maxLength = Math.max(maxLength, currentLength);
+                currentLength = 1;
+            }
+        }
+
+        return Math.max(maxLength, currentLength);
+    }
+
+    // SOLUTION 4: Union-Find approach O(n) average time
+    public int longestConsecutiveUnionFind(int[] nums) {
+        if (nums.length == 0) return 0;
+
+        UnionFind uf = new UnionFind();
+
+        // Add all numbers to union-find
+        for (int num : nums) {
+            uf.add(num);
+        }
+
+        // Union consecutive numbers
+        for (int num : nums) {
+            if (uf.contains(num + 1)) {
+                uf.union(num, num + 1);
+            }
+        }
+
+        return uf.getMaxSize();
+    }
+
+    // Helper class for Union-Find solution
+    class UnionFind {
+        private Map<Integer, Integer> parent;
+        private Map<Integer, Integer> size;
+
+        public UnionFind() {
+            parent = new HashMap<>();
+            size = new HashMap<>();
+        }
+
+        public void add(int x) {
+            if (!parent.containsKey(x)) {
+                parent.put(x, x);
+                size.put(x, 1);
+            }
+        }
+
+        public boolean contains(int x) {
+            return parent.containsKey(x);
+        }
+
+        public int find(int x) {
+            if (parent.get(x) != x) {
+                parent.put(x, find(parent.get(x)));
+            }
+            return parent.get(x);
+        }
+
+        public void union(int x, int y) {
+            int rootX = find(x);
+            int rootY = find(y);
+
+            if (rootX != rootY) {
+                if (size.get(rootX) < size.get(rootY)) {
+                    parent.put(rootX, rootY);
+                    size.put(rootY, size.get(rootX) + size.get(rootY));
+                } else {
+                    parent.put(rootY, rootX);
+                    size.put(rootX, size.get(rootX) + size.get(rootY));
+                }
+            }
+        }
+
+        public int getMaxSize() {
+            return size.values().stream().max(Integer::compareTo).orElse(0);
+        }
+    }
+
+    // SOLUTION 5: Brute Force O(n³) approach (not recommended)
+    public int longestConsecutiveBruteForce(int[] nums) {
+        if (nums.length == 0) return 0;
+
+        int maxLength = 1;
+
+        for (int num : nums) {
+            int currentLength = 1;
+            int currentNum = num;
+
+            // Check for consecutive numbers in positive direction
+            while (contains(nums, currentNum + 1)) {
+                currentNum++;
+                currentLength++;
+            }
+
+            maxLength = Math.max(maxLength, currentLength);
+        }
+
+        return maxLength;
+    }
+
+    private boolean contains(int[] nums, int target) {
+        for (int num : nums) {
+            if (num == target) return true;
+        }
+        return false;
+    }
+
+    // Test method to verify solutions
+    public static void main(String[] args) {
+        LongestConsecutiveSequence solution = new LongestConsecutiveSequence();
+
+        // Test case 1
+        int[] nums1 = {2, 20, 4, 10, 3, 4, 5};
+        System.out.println("Input: [2,20,4,10,3,4,5]");
+        System.out.println("Output: " + solution.longestConsecutive(nums1));
+        System.out.println("Expected: 4 (sequence: [2,3,4,5])");
+
+        // Test case 2
+        int[] nums2 = {0, 3, 2, 5, 4, 6, 1, 1};
+        System.out.println("\nInput: [0,3,2,5,4,6,1,1]");
+        System.out.println("Output: " + solution.longestConsecutive(nums2));
+        System.out.println("Expected: 7 (sequence: [0,1,2,3,4,5,6])");
+
+        // Test case 3: Edge cases
+        int[] nums3 = {};
+        System.out.println("\nInput: []");
+        System.out.println("Output: " + solution.longestConsecutive(nums3));
+        System.out.println("Expected: 0");
+
+        int[] nums4 = {1};
+        System.out.println("\nInput: [1]");
+        System.out.println("Output: " + solution.longestConsecutive(nums4));
+        System.out.println("Expected: 1");
+
+        int[] nums5 = {1, 2, 0, 1};
+        System.out.println("\nInput: [1,2,0,1]");
+        System.out.println("Output: " + solution.longestConsecutive(nums5));
+        System.out.println("Expected: 3 (sequence: [0,1,2])");
+    }
+}
