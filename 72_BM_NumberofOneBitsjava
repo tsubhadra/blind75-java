@@ -1,0 +1,168 @@
+//https://neetcode.io/problems/number-of-one-bits?list=blind75
+public class NumberOfOneBits {
+    
+    /**
+     * Counts the number of 1 bits - Approach 1: Right shift and check LSB
+     * Time Complexity: O(32) = O(1) - always processes 32 bits
+     * Space Complexity: O(1)
+     * 
+     * @param n the unsigned 32-bit integer
+     * @return number of 1 bits in binary representation
+     */
+    public int hammingWeight(int n) {
+        int count = 0;
+        
+        // Process all 32 bits
+        for (int i = 0; i < 32; i++) {
+            // Check if the least significant bit is 1
+            if ((n & 1) == 1) {
+                count++;
+            }
+            // Right shift to process next bit
+            n = n >>> 1;  // Unsigned right shift
+        }
+        
+        return count;
+    }
+    
+    /**
+     * Counts the number of 1 bits - Approach 2: Brian Kernighan's Algorithm
+     * Time Complexity: O(k) where k is the number of 1 bits
+     * Space Complexity: O(1)
+     * 
+     * Key insight: n & (n-1) removes the rightmost 1 bit
+     * 
+     * @param n the unsigned 32-bit integer
+     * @return number of 1 bits in binary representation
+     */
+    public int hammingWeightOptimal(int n) {
+        int count = 0;
+        
+        // Continue until all 1 bits are processed
+        while (n != 0) {
+            count++;
+            // Remove the rightmost 1 bit
+            n = n & (n - 1);
+        }
+        
+        return count;
+    }
+    
+    /**
+     * Counts the number of 1 bits - Approach 3: Using Integer.bitCount()
+     * Time Complexity: O(1) - optimized built-in method
+     * Space Complexity: O(1)
+     * 
+     * @param n the unsigned 32-bit integer
+     * @return number of 1 bits in binary representation
+     */
+    public int hammingWeightBuiltIn(int n) {
+        return Integer.bitCount(n);
+    }
+    
+    /**
+     * Counts the number of 1 bits - Approach 4: Bit manipulation with masks
+     * Time Complexity: O(1) - constant time parallel processing
+     * Space Complexity: O(1)
+     * 
+     * Uses divide-and-conquer approach to count bits in parallel
+     * 
+     * @param n the unsigned 32-bit integer
+     * @return number of 1 bits in binary representation
+     */
+    public int hammingWeightParallel(int n) {
+        // Count bits in pairs
+        n = n - ((n >>> 1) & 0x55555555);
+        
+        // Count bits in groups of 4
+        n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
+        
+        // Count bits in groups of 8
+        n = (n + (n >>> 4)) & 0x0f0f0f0f;
+        
+        // Count bits in groups of 16
+        n = n + (n >>> 8);
+        
+        // Count bits in groups of 32
+        n = n + (n >>> 16);
+        
+        return n & 0x3f; // Return the count (max 32, so 6 bits)
+    }
+    
+    /**
+     * Helper method to convert integer to binary string representation
+     */
+    private String toBinaryString(int n) {
+        StringBuilder binary = new StringBuilder();
+        for (int i = 31; i >= 0; i--) {
+            binary.append((n >>> i) & 1);
+        }
+        return binary.toString();
+    }
+    
+    /**
+     * Helper method to demonstrate Brian Kernighan's algorithm step by step
+     */
+    private void demonstrateAlgorithm(int n) {
+        System.out.println("Demonstrating Brian Kernighan's Algorithm for n = " + n);
+        System.out.println("Binary: " + toBinaryString(n));
+        
+        int count = 0;
+        int step = 1;
+        
+        while (n != 0) {
+            System.out.println("Step " + step + ":");
+            System.out.println("  n = " + n + " (binary: " + toBinaryString(n) + ")");
+            System.out.println("  n-1 = " + (n-1) + " (binary: " + toBinaryString(n-1) + ")");
+            
+            n = n & (n - 1);
+            count++;
+            
+            System.out.println("  n & (n-1) = " + n + " (binary: " + toBinaryString(n) + ")");
+            System.out.println("  Removed 1 bit, count = " + count);
+            System.out.println();
+            
+            step++;
+        }
+        
+        System.out.println("Total 1 bits: " + count);
+    }
+    
+    /**
+     * Test method to demonstrate all approaches
+     */
+    public static void main(String[] args) {
+        NumberOfOneBits solution = new NumberOfOneBits();
+        
+        // Test case 1: n = 23 (binary: 00000000000000000000000000010111)
+        int n1 = 23;
+        System.out.println("Test Case 1: n = " + n1);
+        System.out.println("Binary: " + solution.toBinaryString(n1));
+        System.out.println("Approach 1 (Right shift): " + solution.hammingWeight(n1));
+        System.out.println("Approach 2 (Brian Kernighan): " + solution.hammingWeightOptimal(n1));
+        System.out.println("Approach 3 (Built-in): " + solution.hammingWeightBuiltIn(n1));
+        System.out.println("Approach 4 (Parallel): " + solution.hammingWeightParallel(n1));
+        System.out.println();
+        
+        // Test case 2: n = 2147483645 (binary: 01111111111111111111111111111101)
+        int n2 = 2147483645;
+        System.out.println("Test Case 2: n = " + n2);
+        System.out.println("Binary: " + solution.toBinaryString(n2));
+        System.out.println("Approach 1 (Right shift): " + solution.hammingWeight(n2));
+        System.out.println("Approach 2 (Brian Kernighan): " + solution.hammingWeightOptimal(n2));
+        System.out.println("Approach 3 (Built-in): " + solution.hammingWeightBuiltIn(n2));
+        System.out.println("Approach 4 (Parallel): " + solution.hammingWeightParallel(n2));
+        System.out.println();
+        
+        // Test case 3: Edge cases
+        System.out.println("Edge Cases:");
+        System.out.println("n = 0: " + solution.hammingWeight(0));
+        System.out.println("n = 1: " + solution.hammingWeight(1));
+        System.out.println("n = -1 (all 1s): " + solution.hammingWeight(-1));
+        System.out.println("n = Integer.MAX_VALUE: " + solution.hammingWeight(Integer.MAX_VALUE));
+        System.out.println();
+        
+        // Demonstrate Brian Kernighan's algorithm
+        solution.demonstrateAlgorithm(12); // Binary: 1100
+    }
+}
