@@ -1,0 +1,283 @@
+//https://neetcode.io/problems/jump-game?list=blind75
+public class Solution {
+    
+    // Approach 1: Greedy Algorithm - Most efficient and elegant
+    public boolean canJump(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        int farthest = 0; // Farthest index we can reach
+        
+        for (int i = 0; i < nums.length; i++) {
+            // If current index is beyond our reach, we can't proceed
+            if (i > farthest) {
+                return false;
+            }
+            
+            // Update farthest reachable position
+            farthest = Math.max(farthest, i + nums[i]);
+            
+            // Early termination: if we can reach the last index
+            if (farthest >= nums.length - 1) {
+                return true;
+            }
+        }
+        
+        return true;
+    }
+    
+    // Approach 2: Dynamic Programming - More intuitive but less efficient
+    public boolean canJumpDP(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        int n = nums.length;
+        // dp[i] represents whether we can reach index i
+        boolean[] dp = new boolean[n];
+        
+        dp[0] = true; // We start at index 0
+        
+        for (int i = 0; i < n; i++) {
+            if (!dp[i]) {
+                continue; // Can't reach this position
+            }
+            
+            // From position i, we can jump to positions i+1 to i+nums[i]
+            for (int j = i + 1; j <= Math.min(i + nums[i], n - 1); j++) {
+                dp[j] = true;
+            }
+        }
+        
+        return dp[n - 1];
+    }
+    
+    // Approach 3: Backward Greedy - Start from end and work backward
+    public boolean canJumpBackward(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        int target = nums.length - 1; // Target position (initially last index)
+        
+        // Work backward from second-to-last position
+        for (int i = nums.length - 2; i >= 0; i--) {
+            // If from position i we can reach current target
+            if (i + nums[i] >= target) {
+                target = i; // Update target to current position
+            }
+        }
+        
+        // If target moved all the way back to 0, we can reach the end
+        return target == 0;
+    }
+    
+    // Approach 4: BFS (Breadth-First Search) - Less efficient but shows graph nature
+    public boolean canJumpBFS(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        if (nums.length == 1) {
+            return true;
+        }
+        
+        java.util.Queue<Integer> queue = new java.util.LinkedList<>();
+        boolean[] visited = new boolean[nums.length];
+        
+        queue.offer(0);
+        visited[0] = true;
+        
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+            
+            // Try all possible jumps from current position
+            for (int next = current + 1; 
+                 next <= Math.min(current + nums[current], nums.length - 1); 
+                 next++) {
+                
+                if (next == nums.length - 1) {
+                    return true; // Reached the end
+                }
+                
+                if (!visited[next]) {
+                    visited[next] = true;
+                    queue.offer(next);
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    // Approach 5: Recursive with Memoization
+    public boolean canJumpRecursive(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return false;
+        }
+        
+        Boolean[] memo = new Boolean[nums.length];
+        return canJumpHelper(nums, 0, memo);
+    }
+    
+    private boolean canJumpHelper(int[] nums, int index, Boolean[] memo) {
+        // Base case: reached the last index
+        if (index >= nums.length - 1) {
+            return true;
+        }
+        
+        // Check memoization
+        if (memo[index] != null) {
+            return memo[index];
+        }
+        
+        // Try all possible jumps from current position
+        for (int jump = 1; jump <= nums[index]; jump++) {
+            if (canJumpHelper(nums, index + jump, memo)) {
+                memo[index] = true;
+                return true;
+            }
+        }
+        
+        memo[index] = false;
+        return false;
+    }
+    
+    // Method to find one possible path to reach the end
+    public java.util.List<Integer> findJumpPath(int[] nums) {
+        java.util.List<Integer> path = new java.util.ArrayList<>();
+        
+        if (nums == null || nums.length == 0 || !canJump(nums)) {
+            return path; // Return empty path if impossible
+        }
+        
+        int current = 0;
+        path.add(current);
+        
+        while (current < nums.length - 1) {
+            int maxReach = 0;
+            int nextIndex = current;
+            
+            // Look for the jump that takes us farthest
+            for (int i = current + 1; 
+                 i <= Math.min(current + nums[current], nums.length - 1); 
+                 i++) {
+                
+                int reachFromI = i + nums[i];
+                if (reachFromI > maxReach) {
+                    maxReach = reachFromI;
+                    nextIndex = i;
+                }
+            }
+            
+            current = nextIndex;
+            path.add(current);
+            
+            // Safety check to prevent infinite loop
+            if (path.size() > nums.length) {
+                break;
+            }
+        }
+        
+        return path;
+    }
+    
+    // Helper method to demonstrate the greedy algorithm step by step
+    public void demonstrateGreedy(int[] nums) {
+        System.out.println("\nDemonstrating Greedy Algorithm for: " + 
+                          java.util.Arrays.toString(nums));
+        
+        if (nums == null || nums.length == 0) {
+            System.out.println("Empty array - cannot jump");
+            return;
+        }
+        
+        int farthest = 0;
+        
+        System.out.println("Target: reach index " + (nums.length - 1));
+        System.out.println("Initial: farthest = " + farthest);
+        
+        for (int i = 0; i < nums.length; i++) {
+            if (i > farthest) {
+                System.out.println("Step " + i + ": BLOCKED! Cannot reach index " + 
+                                 i + " (farthest = " + farthest + ")");
+                return;
+            }
+            
+            int newFarthest = Math.max(farthest, i + nums[i]);
+            
+            System.out.printf("Step %d: at index %d, jump length %d, " +
+                            "can reach %d, farthest = %d%n", 
+                            i, i, nums[i], i + nums[i], newFarthest);
+            
+            farthest = newFarthest;
+            
+            if (farthest >= nums.length - 1) {
+                System.out.println("SUCCESS! Can reach the end (index " + 
+                                 (nums.length - 1) + ")");
+                return;
+            }
+        }
+        
+        System.out.println("Final result: " + 
+                          (farthest >= nums.length - 1 ? "SUCCESS" : "FAILURE"));
+    }
+    
+    // Method to demonstrate backward greedy approach
+    public void demonstrateBackwardGreedy(int[] nums) {
+        System.out.println("\nDemonstrating Backward Greedy for: " + 
+                          java.util.Arrays.toString(nums));
+        
+        if (nums == null || nums.length == 0) {
+            System.out.println("Empty array");
+            return;
+        }
+        
+        int target = nums.length - 1;
+        System.out.println("Initial target: index " + target);
+        
+        for (int i = nums.length - 2; i >= 0; i--) {
+            int maxReach = i + nums[i];
+            
+            if (maxReach >= target) {
+                System.out.printf("Index %d: can jump %d positions, " +
+                                "reaches %d, can reach target %d -> " +
+                                "UPDATE target to %d%n", 
+                                i, nums[i], maxReach, target, i);
+                target = i;
+            } else {
+                System.out.printf("Index %d: can jump %d positions, " +
+                                "reaches %d, cannot reach target %d%n", 
+                                i, nums[i], maxReach, target);
+            }
+        }
+        
+        boolean canReach = (target == 0);
+        System.out.println("Final target: " + target);
+        System.out.println("Result: " + (canReach ? "SUCCESS" : "FAILURE"));
+    }
+    
+    // Method to compare performance of different approaches
+    public void compareApproaches(int[] nums) {
+        System.out.println("\nComparing approaches for array of length " + 
+                          nums.length + ":");
+        
+        long start, end;
+        
+        // Greedy Algorithm
+        start = System.nanoTime();
+        boolean result1 = canJump(nums);
+        end = System.nanoTime();
+        System.out.println("Greedy: " + result1 + 
+                          " (Time: " + (end - start) + " ns)");
+        
+        // Dynamic Programming
+        start = System.nanoTime();
+        boolean result2 = canJumpDP(nums);
+        end = System.nanoTime();
+        System.out.println("Dynamic Programming: " + result2 + 
+                          " (Time: " + (end - start) + " ns)");
+        
+        // Backward Greedy
+        start = System.nanoTime();
